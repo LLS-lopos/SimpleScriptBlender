@@ -151,7 +151,10 @@ def creer_crayon_gras(nom):
         bpy.ops.object.gpencil_add(type='LRT_OBJECT')
 
 def creer_armature():
-    """AI is creating summary for creer_armature"""
+    """AI is creating summary for creer_armature
+
+    simple os
+    """
     bpy.ops.object.armature_add()
     
 def creer_lattice():
@@ -296,7 +299,7 @@ def creer_force(nom):
     elif nom == "flux fluide":
         bpy.ops.object.effector_add(type='FLUID')
 
-def collection(tache, nom=None):
+def collection(tache, nom=None, col=None):
     """AI is creating summary for collection
 
     Args:
@@ -316,6 +319,11 @@ def collection(tache, nom=None):
             return bpy.data.collections.new("Collection")
     elif tache == "recuperer" and nom is not None:
         return bpy.data.collections.get(nom, "n'existe pas")
+    elif tache == "dans scene" and nom is not None:
+        return scene().collection.children.link(nom)
+    elif tache == "dans collection":
+        if nom and col is not None:
+            return bpy.data.collections[col].children.link(nom)
 
 def environnement(tache, nom=None):
     """AI is creating summary for environnement
@@ -413,3 +421,81 @@ def liste(nom):
     elif nom == "scene":
         return list(bpy.data.scenes)
 
+def selection(nom, valeur=None):
+    nom = nom.lower()
+    valeur = valeur.lower()
+    if nom == "tout":
+        bpy.ops.object.select_all(action='SELECT')
+    elif nom == "aucun":
+        bpy.ops.object.select_all(action='DESELECT')
+    elif nom == "inverse":
+        bpy.ops.object.select_all(action='INVERT')
+    elif nom == "rectangle":
+        bpy.ops.view3d.select_box()
+    elif nom == "cercle":
+        bpy.ops.view3d.select_circle()
+    elif nom == "lasso":
+        if valeur is not None:
+            if valeur == "definir":
+                bpy.ops.view3d.select_lasso(mode='SET')
+            elif valeur == "etendre":
+                bpy.ops.view3d.select_lasso(mode='ADD')
+            elif valeur == "soustraire":
+                bpy.ops.view3d.select_lasso(mode='SUB')
+            elif valeur == "difference":
+                bpy.ops.view3d.select_lasso(mode='XOR')
+            elif valeur == "intersection":
+                bpy.ops.view3d.select_lasso(mode='AND')
+    elif nom == "type":
+        if valeur is not None:
+            if valeur == "maillage":
+                bpy.ops.object.select_by_type(type='MESH')
+            elif valeur == "courbe":
+                bpy.ops.object.select_by_type(type='CURVE')
+            elif valeur == "surface":
+                bpy.ops.object.select_by_type(type='SURFACE')
+            elif valeur == "metaball":
+                bpy.ops.object.select_by_type(type='META')
+            elif valeur == "texte":
+                bpy.ops.object.select_by_type(type='FONT')
+            elif valeur == "courbe poil":
+                bpy.ops.object.select_by_type(type='CURVES')
+            elif valeur == "nuage point":
+                bpy.ops.object.select_by_type(type='POINTCLOUD')
+            elif valeur == "volume":
+                bpy.ops.object.select_by_type(type='VOLUME')
+            elif valeur == "crayon gras":
+                bpy.ops.object.select_by_type(type='GPENCIL')
+            elif valeur == "armature":
+                bpy.ops.object.select_by_type(type='ARMATURE')
+            elif valeur == "lattice":
+                bpy.ops.object.select_by_type(type='LATTICE')
+            elif valeur == "vide":
+                bpy.ops.object.select_by_type(type='EMPTY')
+            elif valeur == "eclairage":
+                bpy.ops.object.select_by_type(type='LIGHT')
+            elif valeur == "sonde lumiere":
+                bpy.ops.object.select_by_type(type='LIGHT_PROBE')
+            elif valeur == "camera":
+                bpy.ops.object.select_by_type(type='CAMERA')
+            elif valeur == "haut parleur":
+                bpy.ops.object.select_by_type(type='SPEAKER')
+    elif nom == "camera actif":
+        bpy.ops.object.select_camera()
+    elif nom == "miroir":
+        bpy.ops.object.select_mirror()
+    elif nom == "aleatoire":
+        bpy.ops.object.select_random()
+    elif nom == "objet":
+        if valeur is not None:
+            bpy.data.objects[valeur].name
+        else:
+            bpy.context.active_object
+
+def scene(nom=None):
+    if nom is not None:
+        nom = nom.lower()
+        if nom == "scene":
+            return bpy.data.scenes[nom]
+    else:
+        return bpy.context.scene
