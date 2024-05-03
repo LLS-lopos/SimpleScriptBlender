@@ -188,7 +188,7 @@ def collection_a(valeur, objet, col=None):
 
 
 def objet_vers_col(objet, col):
-    if objet and col:
+    if objet and col: # bpy.data.objects[objet]
         ancien_position = objet.location.copy()
         try:
             bpy.context.scene.collection.objects.unlink(objet)
