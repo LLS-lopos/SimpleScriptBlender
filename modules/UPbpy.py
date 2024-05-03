@@ -307,6 +307,9 @@ def collection(tache, nom=None, col=None):
         nom ([str], optional): [récupère une collection]. Defaults to None.
         - creer
         - recuperer
+        - dans scene
+        - dans collection
+        - assigne objet
     Returns:
         [bpy.data.collections.new]: [création d'une nouvelle collection]
         [str: bpy.data.collections.get()]: récupère une collection si elle existe
@@ -324,6 +327,16 @@ def collection(tache, nom=None, col=None):
     elif tache == "dans collection":
         if nom and col is not None:
             return bpy.data.collections[col].children.link(nom)
+    elif tache == "assigne objet":
+        if nom and col is not None:
+            ancien_position = nom.location.copy()
+            try:
+                scene().collections.objects.unlink(bpy.data.objects[nom])
+            except:
+                col_actif = bpy.data.objects[nom.name].users_collection[0].name
+                bpy.data.collections.get(col_actif, "non existent")
+            col.objects.link(nom)
+            nom.location = ancien_position
 
 def environnement(tache, nom=None):
     """AI is creating summary for environnement
@@ -492,10 +505,10 @@ def selection(nom, valeur=None):
         else:
             bpy.context.active_object
 
-def scene(nom=None):
-    if nom is not None:
-        nom = nom.lower()
-        if nom == "scene":
-            return bpy.data.scenes[nom]
-    else:
+def scene(valeur, nom=None):
+    if valeur == "actif":
         return bpy.context.scene
+    elif nom is not None:
+        nom = nom.lower()
+        if valeur == "scene":
+            return bpy.data.scenes.get(nom, "erreur")

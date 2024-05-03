@@ -121,7 +121,7 @@ def resolution_rendu(x=None, y=None):
 
 #---récupérer---#
 def recuperer(valeur=None, objet=None, condition=False):
-    elif valeur == "scene":
+    if valeur == "scene":
         if objet is not None:
             return bpy.data.scenes.get(objet)
         else:
