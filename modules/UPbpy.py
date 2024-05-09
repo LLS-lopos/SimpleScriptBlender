@@ -449,7 +449,6 @@ def selection(nom, valeur=None):
         bpy.ops.view3d.select_circle()
     elif nom == "lasso":
         if valeur is not None:
-            valeur = valeur.lower()
             if valeur == "definir":
                 bpy.ops.view3d.select_lasso(mode='SET')
             elif valeur == "etendre":
@@ -462,7 +461,6 @@ def selection(nom, valeur=None):
                 bpy.ops.view3d.select_lasso(mode='AND')
     elif nom == "type":
         if valeur is not None:
-            valeur = valeur.lower()
             if valeur == "maillage":
                 bpy.ops.object.select_by_type(type='MESH')
             elif valeur == "courbe":
@@ -503,7 +501,7 @@ def selection(nom, valeur=None):
         bpy.ops.object.select_random()
     elif nom == "objet":
         if valeur is not None:
-            bpy.data.objects[valeur].name
+            return bpy.data.objects[valeur].name
         else:
             return bpy.context.active_object
 
