@@ -505,7 +505,7 @@ def selection(nom, valeur=None):
         if valeur is not None:
             bpy.data.objects[valeur].name
         else:
-            bpy.context.active_object
+            return bpy.context.active_object
 
 def scene(valeur, nom=None):
     if valeur == "actif":
