@@ -501,7 +501,9 @@ def selection(nom, valeur=None):
         bpy.ops.object.select_random()
     elif nom == "objet":
         if valeur is not None:
-            return bpy.data.objects[valeur].name
+            bpy.ops.object.select_all(action='DESELECT')
+            bpy.context.view_layer.objects.active = bpy.data.objects[valeur]
+            bpy.data.objects[valeur].select_set(True)
         else:
             return bpy.context.active_object
 
