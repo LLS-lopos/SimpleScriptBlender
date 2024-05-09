@@ -323,20 +323,21 @@ def collection(tache, nom=None, col=None):
     elif tache == "recuperer" and nom is not None:
         return bpy.data.collections.get(nom, "n'existe pas")
     elif tache == "dans scene" and nom is not None:
-        return scene().collection.children.link(nom)
+        return scene(valeur="actif").collection.children.link(nom)
     elif tache == "dans collection":
         if nom and col is not None:
             return bpy.data.collections[col].children.link(nom)
     elif tache == "assigne objet":
         if nom and col is not None:
-            ancien_position = nom.location.copy()
+            obj = bpy.data.objects[nom]
+            ancien_position = obj.location.copy()
             try:
-                scene().collections.objects.unlink(bpy.data.objects[nom])
+                scene(valeur="actif").collections.objects.unlink(obj)
             except:
-                col_actif = bpy.data.objects[nom.name].users_collection[0].name
+                col_actif = obj.users_collection[0].name
                 bpy.data.collections.get(col_actif, "non existent")
-            col.objects.link(nom)
-            nom.location = ancien_position
+            col.objects.link(obj)
+            obj.location = ancien_position
 
 def environnement(tache, nom=None):
     """AI is creating summary for environnement
@@ -512,3 +513,120 @@ def scene(valeur, nom=None):
         nom = nom.lower()
         if valeur == "scene":
             return bpy.data.scenes.get(nom, "erreur")
+
+def ops_sur(valeur, objet=None):
+    if valeur == "scene":
+        return bpy.ops.view3d.set_active_collection(is_master_collection=True)
+    elif valeur == "toggle mode":
+        bpy.ops.object.editmode_toggle()
+    elif valeur == "actif":
+        return bpy.context.active_object
+    elif valeur == "context":
+        return bpy.context.object
+    elif valeur == "suppr point":
+        bpy.ops.curve.delete(type='VERT')
+
+#------#
+
+#---modificateur---#
+def ajouterModifierARRAY(nom, fit_type='FIT_CURVE', count=2, use_re_offset=True, re_offset=(1, 0, 0), use_c_offset=False,
+                         c_offset=(0, 0, 0), use_merge=False, merge_distance=0.001, curve=None, objet_cible=None):
+    """
+    Ajoute un modificateur ARRAY à l'objet spécifié(ou actif) avec les options configurables.
+
+    Paramètres :
+    - nom : Nom du modificateur ARRAY
+    - fit_type : Type d'ajustement ('FIT_CURVE', 'FIT_LENGTH', 'FIXED_COUNT', 'NONE', 'FIT_ARC')
+    - count : (Nombre/longueur) d'éléments dans le tableau
+    - use_re_offset : Utiliser le décalage relatif entre les éléments du tableau
+    - re_offset : Décalage relatif entre les éléments du tableau (tuple de trois valeurs)
+    - use_c_offset : Utiliser le décalage constant entre les éléments du tableau
+    - c_offset : Décalage constant entre les éléments du tableau (tuple de trois valeurs)
+    - use_merge : Fusionne les sommets des éléments adjacents
+    - merge_distance : Distance de fusion des sommets
+    - curve : Courbe à utiliser pour ajuster le tableau (si fit_type est 'FIT_CURVE')
+    - objet_cible : Objet cible pour le tableau (utilisé si le modificateur doit être appliqué à un objet différent de l'objet actif)
+    """
+    objet_actif = objet_cible if objet_cible else bpy.context.active_object
+    if objet_actif is None:
+        print("Aucun objet actif n'est sélectionné.")
+        return
+
+    modifier_array = objet_actif.modifiers.new(name=nom, type='ARRAY')
+
+    modifier_array.use_relative_offset = use_re_offset
+    modifier_array.relative_offset_displace = re_offset
+
+    modifier_array.use_constant_offset = use_c_offset
+    modifier_array.constant_offset_displace = c_offset
+
+    modifier_array.use_merge_vertices = use_merge
+    modifier_array.merge_threshold = merge_distance
+
+    modifier_array.offset_u = 0
+    modifier_array.offset_v = 0
+    modifier_array.start_cap = None
+    modifier_array.end_cap = None
+
+    modifier_array.fit_type = fit_type
+    if fit_type == 'FIT_CURVE':
+        if curve is not None:
+            modifier_array.curve = curve
+    elif fit_type == 'FIXED_COUNT':
+        modifier_array.count = count
+    elif fit_type == 'FIT_LENGTH':
+        modifier_array.fit_length = count
+    elif fit_type == 'NONE':
+        # Aucun ajustement particulier
+        pass
+    elif fit_type == 'FIT_ARC':
+        modifier_array.fit_arc = count
+
+
+def ajouterModifierCURVE(nom, axe='POS_X', objet_courbe=None, vertex='', objet_cible=None):
+    """
+    Ajoute un modificateur CURVE à l'objet spécifié(ou actif) avec les options configurables.
+
+    Paramètres :
+    - nom : Nom du modificateur CURVE
+    - axe : Axe de déformation ('POS_X', 'POS_Y', 'POS_Z', 'NEG_X', 'NEG_Y', 'NEG_Z')
+    - objet_courbe : Objet courbe à utiliser comme référence
+    - vertex : Groupe de sommets à déformer (nom du vertex group)
+    - objet_cible : Objet cible pour le modificateur (utilisé si le modificateur doit être appliqué à un objet différent de l'objet actif)
+    """
+    objet_actif = objet_cible if objet_cible else bpy.context.active_object
+    if objet_actif is None:
+        print("Aucun objet actif n'est sélectionné.")
+        return
+
+    modifier_curve = objet_actif.modifiers.new(name=nom, type='CURVE')
+
+    modifier_curve.object = objet_courbe
+    modifier_curve.deform_axis = axe
+    modifier_curve.vertex_group = vertex
+
+
+def ajouterModifierSIMPLE_DEFORM(nom, methode='TWIST', influence=45, origin=None, axe='X', objet_cible=None):
+
+    objet_actif = objet_cible if objet_cible else bpy.context.active_object
+    if objet_actif is None:
+        print("Aucun objet actif n'est sélectionné.")
+        return
+
+    modifier_simpleDeform = objet_actif.modifiers.new(name=nom, type='SIMPLE_DEFORM')
+
+    if methode == 'TWIST':
+        modifier_simpleDeform.angle = degres_vers_radian(influence)
+    elif methode == 'BEND':
+        modifier_simpleDeform.angle = degres_vers_radian(influence)
+    elif methode == 'TAPER':
+        modifier_simpleDeform.factor = influence
+    elif methode == 'STRETCH':
+        modifier_simpleDeform.factor = influence
+
+    modifier_simpleDeform.origin = origin
+    modifier_simpleDeform.deform_axis = axe
+
+def appliquer(valeur):
+    if valeur == "rotation&scale":
+        bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)
