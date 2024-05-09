@@ -437,8 +437,6 @@ def liste(nom):
 
 def selection(nom, valeur=None):
     nom = nom.lower()
-    if valeur is not None:
-        valeur = valeur.lower()
     if nom == "tout":
         bpy.ops.object.select_all(action='SELECT')
     elif nom == "aucun":
@@ -451,6 +449,7 @@ def selection(nom, valeur=None):
         bpy.ops.view3d.select_circle()
     elif nom == "lasso":
         if valeur is not None:
+            valeur = valeur.lower()
             if valeur == "definir":
                 bpy.ops.view3d.select_lasso(mode='SET')
             elif valeur == "etendre":
@@ -463,6 +462,7 @@ def selection(nom, valeur=None):
                 bpy.ops.view3d.select_lasso(mode='AND')
     elif nom == "type":
         if valeur is not None:
+            valeur = valeur.lower()
             if valeur == "maillage":
                 bpy.ops.object.select_by_type(type='MESH')
             elif valeur == "courbe":
