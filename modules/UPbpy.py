@@ -437,7 +437,8 @@ def liste(nom):
 
 def selection(nom, valeur=None):
     nom = nom.lower()
-    valeur = valeur.lower()
+    if valeur is not None:
+        valeur = valeur.lower()
     if nom == "tout":
         bpy.ops.object.select_all(action='SELECT')
     elif nom == "aucun":
