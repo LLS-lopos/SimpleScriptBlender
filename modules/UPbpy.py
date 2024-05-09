@@ -527,8 +527,7 @@ def ops_sur(valeur, objet=None):
     elif valeur == "suppr point":
         bpy.ops.curve.delete(type='VERT')
 
-#------#
-
+#---à ajuster---#
 #---modificateur---#
 def ajouterModifierARRAY(nom, fit_type='FIT_CURVE', count=2, use_re_offset=True, re_offset=(1, 0, 0), use_c_offset=False,
                          c_offset=(0, 0, 0), use_merge=False, merge_distance=0.001, curve=None, objet_cible=None):
