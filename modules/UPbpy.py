@@ -329,15 +329,17 @@ def collection(tache, nom=None, col=None):
             return bpy.data.collections[col].children.link(nom)
     elif tache == "assigne objet":
         if nom and col is not None:
-            obj = bpy.data.objects[nom]
-            ancien_position = obj.location.copy()
+            ancien_position = bpy.data.objects[nom].location.copy()
             try:
-                scene(valeur="actif").collections.objects.unlink(obj)
+                scene(valeur="actif").collections.objects.unlink(bpy.data.objects[nom])
             except:
-                col_actif = obj.users_collection[0].name
-                bpy.data.collections.get(col_actif, "non existent")
-            col.objects.link(obj)
-            obj.location = ancien_position
+                col_actif = bpy.data.objects[bpy.data.objects[nom].name].users_collection[0].name
+                if col_actif:
+                    bpy.data.objects[bpy.data.objects[nom].name].users_collection[0].objects.unlink(bpy.data.objects[nom])
+                else:
+                    bpy.data.collections.get(col_actif, "non existent")
+            bpy.data.collections[col].objects.link(bpy.data.objects[nom])
+            bpy.data.objects[nom].location = ancien_position
 
 def environnement(tache, nom=None):
     """AI is creating summary for environnement
